@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            font-size: 24px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        #pdfViewer {
+            display: none;
+            width: 100%;
+            height: calc(100vh - 50px);
+            margin-top: 50px;
+            border: none;
+            overflow: auto;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #007BFF;
+            color: #fff;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            margin: 70px auto 0;
+            display: block;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>PDF Viewer</header>
+    <button id="showPdfBtn">Show PDF</button>
+    <div id="pdfViewer"></div>
+
+    <!-- Include PDF.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.5.141/pdf.min.js"></script>
+    <script>
+        document.getElementById('showPdfBtn').addEventListener('click', function() {
+            var pdfViewer = document.getElementById('pdfViewer');
+            var showPdfBtn = document.getElementById('showPdfBtn');
+            var url = 'ሒሳብ 3ኛ ክፍል.pdf';  // Path to your PDF file
+
+            // Clear previous content
+            pdfViewer.innerHTML = '';
+
+            // Load PDF.js and render the PDF
+            pdfjsLib.getDocument(url).promise.then(function(pdf) {
+                // Render all pages in the PDF
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    pdf.getPage(pageNum).then(function(page) {
+                        var scale = 1.5;
+                        var viewport = page.getViewport({ scale: scale });
+
+                        // Create a canvas element
+                        var canvas = document.createElement('canvas');
+                        var context = canvas.getContext('2d');
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+
+                        // Append canvas to the viewer
+                        pdfViewer.appendChild(canvas);
+
+                        // Render the page into the canvas context
+                        var renderContext = {
+                            canvasContext: context,
+                            viewport: viewport
+                        };
+                        page.render(renderContext);
+                    });
+                }
+
+                pdfViewer.style.display = 'block';
+                showPdfBtn.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
